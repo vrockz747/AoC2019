@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void compute(int code[]) {
+int compute(int code[]) {
   int pc = 0;
   while (1) {
     switch (code[pc]) {
@@ -12,8 +12,7 @@ void compute(int code[]) {
       ++pc;
       int value2 = code[code[pc]];
       int result = value1 + value2;
-      ++pc;
-      code[code[pc]] = result;
+      code[code[++pc]] = result;
       break;
     }
 
@@ -23,13 +22,12 @@ void compute(int code[]) {
       ++pc;
       int value2 = code[code[pc]];
       int result = value1 * value2;
-      ++pc;
-      code[code[pc]] = result;
+      code[code[++pc]] = result;
       break;
     }
 
     case 99: {
-      return;
+      return code[0];
       break;
     }
 
@@ -56,9 +54,22 @@ int main() {
     ++i;
     token = strtok(NULL, ",");
   }
-  // update position 1 and 12
-  codes[1] = 12;
-  codes[2] = 2;
-  compute(codes);
-  printf("Value: %d\n", codes[0]);
+  int copy[1000];
+  memcpy(copy, codes, sizeof(codes));
+
+  // update position 1 and 2
+  const int noun = 1;
+  const int verb = 2;
+  for (int i = 0; i < 100; i++) {
+    for (int j = 0; j < 100; j++) {
+      codes[noun] = i;
+      codes[verb] = j;
+      if (compute(codes) == 19690720) {
+        printf("noun*100 + verb = %d\n", (codes[noun] * 100) + codes[verb]);
+        return 0;
+      } else {
+        memcpy(codes, copy, sizeof(codes));
+      }
+    }
+  }
 }
